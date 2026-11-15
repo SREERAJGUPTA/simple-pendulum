@@ -1,0 +1,53 @@
+SIMPLE PENDULUM — TIME IN MOTION
+
+This folder includes the editable project and a complete prebuilt website.
+
+OPEN THE PREBUILT SITE
+1. Open a terminal in this folder.
+2. Run: python3 -m http.server 8080 --bind 127.0.0.1 --directory docs
+   On Windows with Python installed, use python in place of python3.
+3. Open http://127.0.0.1:8080/ in your browser.
+
+Use a local web server; double-clicking index.html is not supported.
+The project-root index.html is the source entry. docs/index.html is the built site.
+Windows-specific behavior has not been independently tested.
+
+GITHUB PAGES
+Upload the contents of this folder to the root of a new repository.
+The docs/ folder is already complete; no build or file copying is needed.
+In Settings > Pages, choose Deploy from a branch, select your branch,
+and select /docs as the publishing folder. Save and use the URL GitHub provides.
+No repository, sharing permission, or GitHub Pages configuration has been changed
+on your behalf. Keep docs/assets and all generated files together.
+
+EDIT AND REBUILD
+With Node.js 22 or later and npm installed:
+    npm ci
+    npm run develop -- --host 127.0.0.1
+For a production rebuild:
+    npm test
+    npm run build
+The new build is in dist/. Replace the complete contents of docs/ with dist/
+before publishing a changed version. README.md has detailed instructions.
+
+WHAT IS INCLUDED
+src/             Editable React, TypeScript, Three.js and CSS source
+public/          Local icon and app manifest
+docs/            Prebuilt static website for GitHub Pages or another static host
+tests/           31 numerical and observation-record checks
+verification/    Scientific results and actual browser verification scope
+project-contract.json  Requirements and evidence record
+THIRD_PARTY_NOTICES.md  Third-party component licenses
+SHA256SUMS.txt   File checksums for this download
+
+VALIDATION NOTES
+The actual SVG fallback and core measurement workflow were checked in the
+available browser. WebGL was disabled there, so the GPU-rendered 3D appearance,
+input path and device performance remain unverified. A cached reload worked
+with the preview server stopped. A full network-disabled browser restart and
+actual phone/touch-device checks remain unverified. See verification/ for detail.
+
+Private hosted site:
+https://simple-pendulum-time-in-motion.workspace-092205.chatgpt.site/
+
+Source revision: cc1f1bbaae1868abafed31e528dc001d2e26a4a6

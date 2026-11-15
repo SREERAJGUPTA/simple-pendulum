@@ -1,0 +1,13 @@
+{
+  "id": "./",
+  "name": "Simple Pendulum — Time in Motion",
+  "short_name": "Time in Motion",
+  "description": "Explore a pendulum, measure its period, and trace the transfer of energy.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111f2e",
+  "theme_color": "#111f2e",
+  "lang": "en",
+  "icons": [{ "src": "./favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "project": {
+    "title": "Simple Pendulum — Time in Motion",
+    "audience": "Grades 8–11 continuum: intuitive exploration first, with optional quantitative practical work for learners comfortable with periods, units and graphs.",
+    "outcome": "Measure full-cycle periods, compare controlled trials, and estimate gravitational acceleration from a T²–L graph while explaining the small-angle assumption and one real-lab source of uncertainty.",
+    "session": "A 10–20 minute core investigation, with optional extended practical work.",
+    "devices": "Desktop and tablet browsers; keyboard and single-pointer alternatives to direct dragging.",
+    "delivery": "Bundled static React/TypeScript/Three.js application, published with Sites; relative-path production output also suitable for a future GitHub Pages subpath."
+  },
+  "identity": {
+    "direction": "Kinetic Observatory",
+    "composition": "Deep-blue cinematic opening and instrument stage, brass pendulum, clear light laboratory controls, linked energy trace and experimental notebook.",
+    "interaction": "Drag and release the bob, isolate one parameter, slow the same physical motion, time repeated centre crossings, record and compare.",
+    "signature": "A shared physical state ties visible bob motion to angle, energy and actual crossing-time measurements; notebook trials can restore their conditions and contribute eligible points to a gravity fit.",
+    "distinction": "Trajectory and time are the dominant interactions; a dark kinetic stage, live graph composition and experiment notebook distinguish this from the earlier ivory metrology instrument galleries."
+  },
+  "model": {
+    "scope": "Nonlinear planar simple pendulum with optional linear angular-velocity damping; the undamped small-angle equation is a labelled comparison, not the integration model.",
+    "units": "SI: length in metres, time in simulated seconds, gravity in m/s², mass in kg, damping rate γ in s⁻¹, energy in J. Angles are radians internally and degrees at the release control.",
+    "state": "Authoritative θ, ω, simulated time and independently integrated dissipated energy Q. Parameters are length, gravity, mass, damping and release angle. Recorded trials and prediction-card selections are separate from live physical state.",
+    "equation": "θ̇ = ω; ω̇ = −(g/L)sinθ − γω; Q̇ = γmL²ω².",
+    "integration": "Classical RK4 at fixed dt = 1/240 s, independent of display refresh and playback rate; graph samples every 1/30 simulated second, retained in a bounded buffer.",
+    "observation": "Period comes from successive positive-going centre crossings with linear within-step event interpolation. The first crossing arms timing; a subsequent crossing completes a full period.",
+    "domain": "L 0.25–2.5 m; g 0.5–25 m/s²; mass 0.1–2 kg; γ 0–1 s⁻¹; release −80° to +80°. Zero motion and overdamped states do not imply an observed oscillation period.",
+    "assumptions": [
+      "Point mass at the visible bob centre; length is measured from pivot to centre.",
+      "Massless inextensible suspension, fixed pivot, uniform gravity and one vertical plane.",
+      "Linear resistance is normalized as angular damping rate γ; it is not a calibrated air-density setting.",
+      "Potential energy is zero at the lowest position; K + U + Q is the energy account for an unchanged free run."
+    ],
+    "limitations": [
+      "No suspension stretch or mass, finite-bob rotational inertia, moving support, forcing, quadratic drag, dry friction, out-of-plane motion or Earth-rotation effect.",
+      "Theoretical finite-amplitude periods are undamped references. The small-angle gravity inference retains finite-amplitude bias even for otherwise perfect simulated measurements.",
+      "The notebook adds no fabricated reaction-time noise; a real practical includes handling and measurement uncertainty.",
+      "Graphics, browser offline lifecycle, accessibility and classroom outcomes require their own evidence; numerical results alone do not certify them."
+    ],
+    "invariants": [
+      {
+        "id": "I1",
+        "statement": "At fixed γ, changing mass alone leaves angular motion unchanged while energies scale with mass.",
+        "oracle": "Independent mass-scaled runs and dimensional energy comparison in tests/physics.test.ts.",
+        "check_ids": [
+          "C1"
+        ]
+      },
+      {
+        "id": "I2",
+        "statement": "Undamped mechanical energy is conserved within the declared numerical bound; damping reduces mechanical energy while independently integrated Q preserves the balance.",
+        "oracle": "Fastest allowed 80° run: relative undamped drift below 2e-6 over 120 simulated seconds; damped balance error below 2e-7 over the tested interval.",
+        "check_ids": [
+          "C1"
+        ]
+      },
+      {
+        "id": "I3",
+        "statement": "Observed periods are full-cycle, same-direction crossing intervals and agree with independently evaluated limiting/reference cases.",
+        "oracle": "Analytic tiny-angle period, independent Simpson quadrature for finite-amplitude periods, explicit half-cycle and duplicate-sample cases.",
+        "check_ids": [
+          "C1"
+        ]
+      },
+      {
+        "id": "I4",
+        "statement": "Physical length and angle in the rendered apparatus agree with pivot-to-centre model geometry.",
+        "oracle": "Rendered datum inspection at minimum/maximum lengths and signed release angles, with 3D and fallback evidence kept separate.",
+        "check_ids": [
+          "C4"
+        ]
+      }
+    ]
+  },
+  "capabilities": {
+    "graphics3d": true,
+    "offline": true,
+    "persistence": true,
+    "performance_claim": false,
+    "assessment": true
+  },
+  "build": {
+    "directory": "dist",
+    "sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a",
+    "note": "Partial verification record, not full release certification. Retain blocked/unverified capability gates; refresh final build and artifact bindings after any relevant changes."
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Scientifically accurate nonlinear model, energy and period references.",
+      "critical": true,
+      "acceptance": "Domain validation, analytic limits, independent finite-amplitude references, energy balance and convergence checks pass with stated bounds; unsupported states have explicit behavior.",
+      "check_ids": [
+        "C1"
+      ]
+    },
+    {
+      "id": "R2",
+      "description": "A draggable bob and equivalent non-drag operation.",
+      "critical": true,
+      "acceptance": "Pointer drag/release, cancellation and a labelled angle-control route set the same bounded physical release without fighting page scrolling or changing length.",
+      "check_ids": [
+        "C2",
+        "C4",
+        "C8",
+        "C20"
+      ]
+    },
+    {
+      "id": "R3",
+      "description": "Working length, gravity, damping and playback controls with honest time.",
+      "critical": true,
+      "acceptance": "Physical changes restart dependent traces/timing; pause, step and slow motion preserve a consistent simulated clock; background interruption cannot create a large time jump.",
+      "check_ids": [
+        "C3",
+        "C19"
+      ]
+    },
+    {
+      "id": "R4",
+      "description": "Live energy and angle graphs derived from model samples.",
+      "critical": true,
+      "acceptance": "The current visible graph, numeric values and bob state agree; axes and SI units are correct; paths use sampled data without misleading smoothing or a wall-time scale.",
+      "check_ids": [
+        "C6"
+      ]
+    },
+    {
+      "id": "R5",
+      "description": "Period measurement, observation notebook and T²–L gravity inference.",
+      "critical": true,
+      "acceptance": "Measure, record, replay and export a complete trial; obtain a fit from at least three distinct eligible lengths under the same gravity, zero damping and small release conditions; flag excluded rows.",
+      "check_ids": [
+        "C5",
+        "C14"
+      ]
+    },
+    {
+      "id": "R6",
+      "description": "Distinct, legible 3D visuals and accessible essential tasks.",
+      "critical": true,
+      "acceptance": "Inspect actual WebGL opening and active lab views, minimum/maximum apparatus states and narrow layouts; essential keyboard/non-drag paths, focus, labels and reduced-motion behavior work without blocked controls.",
+      "check_ids": [
+        "C4",
+        "C7",
+        "C8",
+        "C9",
+        "C15",
+        "C20"
+      ]
+    },
+    {
+      "id": "R7",
+      "description": "Complete static production delivery.",
+      "critical": true,
+      "acceptance": "A clean packaged production entry and assets work at the intended base/subpath and the published Site reports successful deployment; source and operational instructions match the build.",
+      "check_ids": [
+        "C10",
+        "C16",
+        "C22"
+      ]
+    },
+    {
+      "id": "R8",
+      "description": "Coherent local offline release and safe updates.",
+      "critical": true,
+      "acceptance": "Complete cache preparation, a network-disabled reload/restart, optional feature use, update preservation and incomplete-cache handling are observed; readiness is never inferred from manifest existence alone.",
+      "check_ids": [
+        "C11",
+        "C21"
+      ]
+    },
+    {
+      "id": "R9",
+      "description": "Local observation persistence with explicit failure and reset semantics.",
+      "critical": true,
+      "acceptance": "Saved observations survive reload; corrupt/unavailable storage has useful feedback; restart preserves trials and notebook clear can be undone; exported values match stored observations.",
+      "check_ids": [
+        "C12",
+        "C17"
+      ]
+    },
+    {
+      "id": "R10",
+      "description": "Formative conceptual prediction and feedback.",
+      "critical": true,
+      "acceptance": "Each prediction card accepts a choice, distinguishes a correct and incorrect explanation, and supports retry; feedback remains readable and accessible without claiming secure assessment or measured learning impact.",
+      "check_ids": [
+        "C13",
+        "C18"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "kind": "science",
+      "status": "passed",
+      "method": "Executed 21 Vitest domain tests plus deterministic energy/period probes; independent analytic and quadrature references, convergence, domain rejection and event-direction checks. Source/test hashes in the artifact match the current files.",
+      "environment": "Managed Linux workspace; Node 24.22.1; Vitest 3.2.4; 14 November 2026. This is a domain-only check, not rendered/browser validation.",
+      "artifact": "verification/physics-notes.md",
+      "sha256": "606fc17c7bcec9370e8652a465c9596d2ac779c175877d911ab650b4395915ac",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C2",
+      "kind": "workflow",
+      "status": "planned",
+      "method": "Exercise direct bob dragging, pointer cancellation and the equivalent release-angle route through real UI controls.",
+      "note": "SVG fallback dragging and bob keyboard hold/ArrowRight adjustment/Enter release were observed. Pointer cancellation and the complete keyboard-only experiment/notebook workflow remain pending.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C3",
+      "kind": "workflow",
+      "status": "planned",
+      "method": "Change each physical parameter; exercise pause, step, slow motion, restart and hidden-tab recovery while inspecting simulated time and state.",
+      "note": "Quarter-speed one-cycle measurement at 0.50 m/5°/zero damping matched the normal displayed 1.419 s period. Unchanged parameter blur preserved the run and off-step 0.255 m length was rejected. Other rates, step and hidden-tab paths remain incompletely covered.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C4",
+      "kind": "geometry",
+      "status": "blocked",
+      "method": "Inspect actual rendered pivot/bob-centre datums, arc bounds and signed angles across domain endpoints; review fallback separately.",
+      "note": "The available browser reports GL_VENDOR and GL_RENDERER Disabled. SVG fallback was inspected, but full WebGL apparatus geometry and domain-endpoint checks are unverified.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C5",
+      "kind": "workflow",
+      "status": "planned",
+      "method": "Complete repeated-cycle measurement, record/replay/export, collect three compatible lengths, inspect fit, and test excluded damped/large-angle/different-gravity rows.",
+      "note": "The three-length, single-cycle measurement/export/fit path passed as C14. Repeated-cycle browser counts, replay and every exclusion condition still require their specified checks.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C6",
+      "kind": "geometry",
+      "status": "planned",
+      "method": "Compare live plotted endpoints and numeric values with current model state; inspect energy reference, units, period-squared points and regression axes.",
+      "note": "Exported T² values and displayed gravity fit agree with an independent CSV calculation. Comprehensive rendered energy/angle endpoint and graph-axis checks remain incomplete.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C7",
+      "kind": "visual",
+      "status": "planned",
+      "method": "Review representative opening, active lab, completed notebook and narrow-screen views for composition, legibility and obstruction.",
+      "note": "SVG fallback desktop views and narrow CSS layouts at 454 and 340 px were observed as C15. This does not certify every target view or 3D rendering.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C8",
+      "kind": "accessibility",
+      "status": "planned",
+      "method": "Keyboard and single-pointer non-drag completion, visible focus, control labels, readable feedback, reduced-motion behavior and narrow reflow; do not equate limited checks with full WCAG conformance.",
+      "note": "Bob keyboard hold/adjust/release, narrow CSS reflow and numeric input were observed. Comprehensive keyboard, reduced-motion, focus and feedback-announcement coverage remains pending.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C9",
+      "kind": "graphics",
+      "status": "blocked",
+      "method": "Observe the actual WebGL apparatus, material/lighting, canvas input and recovery; distinguish SVG fallback evidence from 3D evidence.",
+      "note": "GPU rendering is disabled in the QA browser; no observed Three.js materials, lighting, picking or context recovery. SVG fallback evidence is not a passed 3D gate.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C10",
+      "kind": "deployment",
+      "status": "planned",
+      "method": "Build, static path/hash preflight, clean extraction/production serving at the intended subpath, then inspect the terminal successful native Site deployment result.",
+      "note": "Native private deployment succeeded (C16) and static preflight at /time-in-motion/ returned no errors (C22). The hosted browser encountered a sign-in gate; clean-package and authenticated hosted interaction checks remain distinct.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C11",
+      "kind": "offline",
+      "status": "planned",
+      "method": "Browser complete-cache install, network-disabled reload/restart, waiting-worker update with existing observations, and cache failure/eviction recovery.",
+      "note": "Online cache readiness, ordinary reload, explicit updates and an existing controlled-tab reload with the origin server stopped were observed (C21). Full network-disabled browser restart, failed-cache and eviction recovery remain unverified.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C12",
+      "kind": "persistence",
+      "status": "planned",
+      "method": "Save/reload observations, CSV content verification, clear/undo, malformed saved data and unavailable-storage recovery.",
+      "note": "Browser reload/update retention and exact exported CSV passed as C17. Record corruption/quota behavior has unit coverage; clear/undo and those failure paths were not observed in the browser.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C13",
+      "kind": "assessment",
+      "status": "planned",
+      "method": "Use each prediction card through a correct attempt and an incorrect attempt followed by retry; inspect feedback and accessible announcements.",
+      "note": "Representative wrong/correct prediction feedback was observed as C18. Every-card keyboard/live-region and retry coverage remains unverified.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b"
+    },
+    {
+      "id": "C14",
+      "kind": "workflow",
+      "status": "passed",
+      "method": "Complete three browser single-cycle trials at 0.5, 1.0 and 1.5 m with g=9.81, release=5°, damping=0; record and export them; inspect displayed g=9.80 and independently calculate the fit from the downloaded CSV.",
+      "environment": "Primary QA session on the compiled local production preview in the managed browser; exact exported CSV inspected locally. GPU disabled. Native Sites result used only for C16.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C15",
+      "kind": "visual",
+      "status": "passed",
+      "method": "Observe and drag the SVG fallback apparatus on the compiled local preview. Inspect normal-browser-zoom layouts at 454 CSS px/document449 and 340 CSS px/document337; verify stacked headings, input and slider fit and numeric .50 m edit works. This is not GPU or touch-hardware evidence.",
+      "environment": "Primary QA session on the compiled local production preview in the managed browser; exact exported CSV inspected locally. GPU disabled. Native Sites result used only for C16.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C16",
+      "kind": "deployment",
+      "status": "passed",
+      "method": "Record the native Sites successful private deployment separately from browser rendering. The available hosted-page visit encountered a sign-in gate; local compiled preview supplied interaction evidence.",
+      "environment": "Primary QA session on the compiled local production preview in the managed browser; exact exported CSV inspected locally. GPU disabled. Native Sites result used only for C16.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C17",
+      "kind": "persistence",
+      "status": "passed",
+      "method": "Verify all three recorded notebook rows remain after ordinary reload and explicit service-worker Update & reload, including the final worker after the wording patch. Inspect the downloaded CSV exact conditions, period and T² values and its SHA-256.",
+      "environment": "Primary QA session on the compiled local production preview in the managed browser; exact exported CSV inspected locally. GPU disabled. Native Sites result used only for C16.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C18",
+      "kind": "assessment",
+      "status": "passed",
+      "method": "Observe representative incorrect and correct prediction choices produce their respective corrective/explanatory feedback. This does not certify complete every-card or screen-reader coverage.",
+      "environment": "Primary QA session on the compiled local production preview in the managed browser; exact exported CSV inspected locally. GPU disabled. Native Sites result used only for C16.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C19",
+      "kind": "workflow",
+      "status": "passed",
+      "method": "Select quarter-speed playback with aria-pressed true; complete one cycle at L = 0.50 m, release 5°, damping 0. Observe average period 1.419 s and T = 1.419 ÷ 1 = 1.419, matching normal playback to displayed precision. Do not claim unobserved precision or all-rate coverage.",
+      "environment": "Primary QA session on the compiled production preview in the managed browser; SVG fallback; observed UI state and screenshot references in browser-report.md.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C20",
+      "kind": "accessibility",
+      "status": "passed",
+      "method": "With the bob paused, Enter holds the displayed 0.1° angle at displayed speed/time 0.00; ArrowRight sets 1.1° while speed stays zero; Enter releases from rest with confirmation. This is a scoped bob-keyboard check, not a full accessibility audit.",
+      "environment": "Primary QA session on the compiled production preview in the managed browser; SVG fallback; observed UI state and screenshot references in browser-report.md.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C21",
+      "kind": "offline",
+      "status": "passed",
+      "method": "Stop the local preview server and observe its stopped status. Reload the existing controlled tab at /#laboratory; verify the app renders, footer says Ready for offline use, Moon preset sets gravity to 1.62 and three notebook rows remain. This is not a full browser restart or a test with every network connection disabled.",
+      "environment": "Primary QA session: managed browser controlled local production preview for C21; managed CLI static preflight for C22. Exact scope and limitations recorded in browser-report.md.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    },
+    {
+      "id": "C22",
+      "kind": "deployment",
+      "status": "passed",
+      "method": "Run static_preflight.py dist --base /time-in-motion/ --offline-manifest offline-manifest.json --pages-branch; observe errors: [] and the recorded build fingerprint. This checks static paths, manifest hashes and .nojekyll, not browser execution or worker lifecycle.",
+      "environment": "Primary QA session: managed browser controlled local production preview for C21; managed CLI static preflight for C22. Exact scope and limitations recorded in browser-report.md.",
+      "artifact": "verification/browser-report.md",
+      "sha256": "0e35b869db430e8cb57523de716e1897d27ce36054328444fa2723a7cefe637b",
+      "build_sha256": "246d0429f8a3ec5e8429a0d131943b8c0078a88c9edc29e92e5d38b2243fad6a"
+    }
+  ]
+}

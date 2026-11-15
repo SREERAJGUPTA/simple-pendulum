@@ -1,0 +1,35 @@
+{
+  "application": "time-in-motion",
+  "version": "af03494fbfc9a0bfce6d",
+  "strategy": "Complete release precache; activation on first install, closed old clients, or explicit update approval.",
+  "files": [
+    {
+      "url": "./assets/index-BLFD4ZeQ.css",
+      "sha256": "897822642e8f3033429bb11078c48fe95a5eecaa835135b3f293684489f72210"
+    },
+    {
+      "url": "./assets/index-CaneWlVh.js",
+      "sha256": "0d945726b50d5b2f354bf6281b9ccd9df32dd41e8f82cf497c1770f71ed5ce1a"
+    },
+    {
+      "url": "./assets/three-DKTPqV_2.js",
+      "sha256": "444f281027e5d99fd21f761e41777b8e6fd2f7abe8a460bede45119dbed55ce8"
+    },
+    {
+      "url": "./favicon.svg",
+      "sha256": "07f85c8bb63432d97baeefc964cb7e1c91d3ca01fe5e861c0f25ff021b3419aa"
+    },
+    {
+      "url": "./index.html",
+      "sha256": "98ac11c6aa139dd01f169a7b81710bdd744fbbcabbce0b950cf34f82bec7a5f6"
+    },
+    {
+      "url": "./manifest.webmanifest",
+      "sha256": "af64a1a4139e82c6c7f1ba56b940ffb539feecfd883be08147855dbd96407671"
+    },
+    {
+      "url": "./third-party-notices.txt",
+      "sha256": "6603235f4a43b8d16df205eddf03eab9cb2853c3e11ddd6203e558ddc1216ba2"
+    }
+  ]
+}
